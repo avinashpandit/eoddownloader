@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='utf-8'?> <!DOCTYPE hibernate-configuration
+        PUBLIC "-//Hibernate/Hibernate Configuration DTD//EN"
+        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+    <session-factory>
+        <property name="connection.url">jdbc:mysql://localhost:3306/quotes_0</property>
+        <property name="connection.username">root</property>
+        <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+        <property name="dialect">org.hibernate.dialect.MySQLDialect</property>
+        <property name="connection.password">password</property>
+        <property name="transaction.factory_class">org.hibernate.transaction.JDBCTransactionFactory</property>
+        <property name="current_session_context_class">thread</property>
+        <property name="c3p0.min_size">1</property>
+        <property name="c3p0.max_size">10</property>
+        <property name="c3p0.timeout">1800</property>
+        <property name="c3p0.acquireRetryAttempts">4</property>
+        <property name="c3p0.acquireIncrement">1</property>
+        <property name="c3p0.idleConnectionTestPeriod">36000</property>
+        <property name="c3p0.initialPoolSize">1</property>
+        <property name="c3p0.maxPoolSize">10</property>
+        <property name="c3p0.maxIdleTime">1200</property>
+        <property name="c3p0.maxStatements">30</property>
+        <property name="c3p0.minPoolSize">1</property>
+        <property name="hibernate.default_batch_fetch_size">1000</property>
+        <property name="hibernate.connection.release_mode">after_statement</property>
+        <mapping resource="com/avi/core/EndOfDay.hbm.xml"/>
+        <mapping resource="com/avi/core/Symbol.hbm.xml"/>
+        <mapping resource="com/avi/core/Property.hbm.xml"/>
+    </session-factory>
+</hibernate-configuration>

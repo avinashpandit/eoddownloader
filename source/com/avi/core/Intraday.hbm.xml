@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="com.avi.core.IntraDay" table="quotes">
+        <id name="id" type="int">
+            <column name="ID"/>
+            <generator class="increment">
+            </generator>
+
+        </id>
+        <property
+                name="symbol"
+                type="int">
+            <column name="WKNID"/>
+        </property>
+        <property
+                name="open"
+                type="java.lang.Float">
+            <column name="QOpen"/>
+        </property>
+        <property
+                name="close"
+                type="java.lang.Float">
+            <column name="QClose"/>
+
+        </property>
+        <property
+                name="high"
+                type="java.lang.Float">
+            <column name="QHigh"/>
+        </property>
+        <property
+                name="low"
+                type="java.lang.Float">
+            <column name="QLow"/>
+        </property>
+        <property
+                name="volume"
+                type="java.lang.Float">
+            <column name="QVol"/>
+        </property>
+        <property
+                name="tickDate"
+                type="java.lang.Long">
+            <column name="QDate"/>
+        </property>
+        <property
+                name="source"
+                type="java.lang.Character">
+            <column name="QSource"/>
+        </property>
+    </class>
+
+</hibernate-mapping>
+

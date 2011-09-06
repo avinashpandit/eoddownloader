@@ -1,0 +1,219 @@
+<project name="avitrader" default="compile-only" basedir=".">
+    <!-- The base directory for compilation targets -->
+    <property name="build.home" value="${basedir}"/>
+    <property file="./build.properties"/>
+
+    <property name="src" value="${build.home}/source"/>
+    <property name="dest" value="${build.home}/classes"/>
+    <property name="destDir" value="${build.home}/dest"/>
+    <property name="lib.dir" value="${build.home}/lib"/>
+    <property name="tomcat.lib.dir" value="${tomcat.dir}/lib"/>
+    <property name="tomcat.conf.dir" value="${tomcat.dir}/conf"/>
+    <property name="tomcat.bin.dir" value="${tomcat.dir}/bin"/>
+    <property name="tomcat.webapps.dir" value="${tomcat.dir}/webapps"/>
+    <property name="properties.dir" value="${build.home}/bin"/>
+
+    <!-- Classpath declaration -->
+    <path id="project.classpath">
+        <pathelement path="${properties.dir}"/>
+        <pathelement path="${dest}"/>
+        <fileset dir="${lib.dir}">
+            <include name="**/*.jar"/>
+            <include name="**/*.zip"/>
+        </fileset>
+        <fileset dir="${tomcat.lib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <!-- Useful shortcuts -->
+    <patternset id="meta.files">
+        <include name="**/*.xml"/>
+        <include name="**/*.properties"/>
+    </patternset>
+
+
+    <target name="compile-only"
+            description="Compile shareable components">
+        <javac srcdir="${src}" debug="on" destdir="${dest}" target="1.6" classpathref="project.classpath"/>
+        <copy todir="${dest}">
+            <fileset dir="${src}" includes="**/*.xml"/>
+            <fileset dir="${src}" includes="**/*.properties"/>
+        </copy>
+    </target>
+
+    <target name="clean"
+            description="clean">
+        <delete>
+            <fileset dir="${dest}" includes="**/*.class"/>
+            <fileset dir="${dest}" includes="**/*.xml"/>
+            <fileset dir="${dest}" includes="**/*.properties"/>
+            <fileset dir="${build.home}/logs" includes="*.log"/>
+        </delete>
+    </target>
+
+    <target name="make-jar">
+        <jar jarfile="${destDir}/jsystemtrader.jar"
+             index="true"
+             basedir="${build.home}/classes">
+        </jar>
+    </target>
+
+    <!-- Copy metadata to build classpath -->
+    <target name="copymetafiles">
+        <mkdir dir="${dest}"/>
+        <copy todir="${dest}">
+            <fileset dir="${src}">
+                <patternset refid="meta.files"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="deploy" depends="compile-only,make-jar,copymetafiles,stopServer">
+        <delete file="avitrader.war"/>
+        <war destfile="${destDir}/avitrader.war" webxml="Web Content/WEB-INF/web.xml">
+            <fileset dir="Web Content"/>
+            <manifest>
+                <attribute name="Built-By" value="${user.name}"/>
+            </manifest>
+            <lib dir="${lib.dir}"/>
+            <classes dir="${dest}"/>
+        </war>
+        <jar destfile="${tomcat.lib.dir}/jsystemtrader.jar" basedir="${destDir}"/>
+        <delete file="${tomcat.webapps.dir}/avitrader.war"/>
+        <delete dir="${tomcat.webapps.dir}/avitrader"/>
+        <copy todir="${tomcat.webapps.dir}">
+            <fileset file="${destDir}/avitrader.war"/>
+        </copy>
+        <antcall target="startServer"/>
+    </target>
+
+    <target name="run" depends="compile-only"
+            description="Build and run DailyDownloader">
+        <java fork="true"
+              classname="com.avi.downloader.EndOfDayDownloader">
+            <classpath>
+                <path refid="project.classpath"/>
+            </classpath>
+        </java>
+    </target>
+
+    <target name="runGoogle" depends="compile-only"
+            description="Build and run google DailyDownloader">
+        <java fork="true"
+              classname="com.avi.downloader.google.GoogleHistoricalDataDownloaderC">
+            <classpath>
+                <path refid="project.classpath"/>
+            </classpath>
+        </java>
+    </target>
+
+    <target name="runGoogleNSE" depends="compile-only"
+            description="Build and run google DailyDownloader">
+        <java fork="true"
+              classname="com.avi.downloader.google.GoogleNSEDownloaderC">
+            <classpath>
+                <path refid="project.classpath"/>
+            </classpath>
+        </java>
+    </target>
+
+    <target name="runDucasDownloader" depends="compile-only"
+            description="Build and run Ducas Forex Downloader">
+        <java fork="true"
+              classname="com.avi.downloader.ducascopy.DucasDownloaderC">
+            <classpath>
+                <path refid="project.classpath"/>
+            </classpath>
+        </java>
+    </target>
+
+    <target name="runDucasHistoryDownloader" depends="compile-only"
+            description="Build and run Ducas Forex Downloader">
+        <java fork="true"
+              classname="com.avi.downloader.ducascopy.DucasHistoryDownloader">
+            <classpath>
+                <path refid="project.classpath"/>
+            </classpath>
+        </java>
+    </target>
+
+    <target name="runIB" depends="compile-only"
+            description="Build and run IBDownloader">
+        <java fork="true"
+              classname="com.avi.downloader.InteractiveBrokers.IBDownloaderC">
+            <classpath>
+                <path refid="project.classpath"/>
+            </classpath>
+        </java>
+    </target>
+
+    <target name="runIBForex" depends="compile-only"
+            description="Build and run IBDownloader">
+        <java fork="true"
+              classname="com.avi.downloader.InteractiveBrokers.IBForexDownloaderC">
+            <classpath>
+                <path refid="project.classpath"/>
+            </classpath>
+        </java>
+    </target>
+
+    <target name="run1" depends="compile-only"
+            description="Build and run IndiaBullsDataFetcherC">
+        <java fork="true"
+              classname="com.avi.downloader.IndiaBulls.IndiaBullsDataFetcherC">
+            <classpath>
+                <path refid="project.classpath"/>
+            </classpath>
+        </java>
+    </target>
+
+    <target name="run2"
+            description="Build and run IndiaBullsDataFetcherC">
+        <java fork="true"
+              classname="com.avi.downloader.InvestBulls.InvestBullsIntradayDataFetcherC"
+              classpathref="project.classpath" maxmemory="1200m">
+            <arg value="${num}"/>
+            <classpath>
+                <path refid="project.classpath"/>
+            </classpath>
+        </java>
+    </target>
+
+    <target name="run3"
+            description="Build and run Optimizer">
+        <java fork="true"
+              classname="com.avi.executors.BulkSymbolStrategyOptimizer"
+              classpathref="project.classpath" maxmemory="1200m">
+            <arg line="${num} ${num1} ${num2}"/>
+            <jvmarg value="-verbose:gc -XX:+PrintGCTimeStamps -XX:+PrintGCDetails"/>
+            <classpath>
+                <path refid="project.classpath"/>
+            </classpath>
+        </java>
+    </target>
+
+    <target name="run4"
+            description="Build and run bulk back test">
+        <java fork="true" classname="com.avi.executors.BulkBackTestStrategyExecutor"
+              classpathref="project.classpath" maxmemory="1200m">
+            <arg line="${num} ${num1} ${num2}"/>
+            <classpath>
+                <path refid="project.classpath"/>
+            </classpath>
+        </java>
+    </target>
+
+    <target name="startServer">
+        <exec dir="${tomcat.bin.dir}" executable="cmd" os="Windows 7" spawn="true">
+            <arg line="/c startup.bat"/>
+        </exec>
+    </target>
+
+    <target name="stopServer">
+        <exec dir="${tomcat.bin.dir}" executable="cmd" os="Windows 7">
+            <arg line="/c shutdown.bat"/>
+        </exec>
+    </target>
+
+</project>
